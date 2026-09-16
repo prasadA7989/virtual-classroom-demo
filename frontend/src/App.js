@@ -99,7 +99,7 @@ function App() {
 
         <div className="container">
 
-            <h1>Virtual Classroom Platform</h1>
+            <h1>Virtual Classroom Platform V2</h1>
 
             <h2>Student Registration</h2>
 
