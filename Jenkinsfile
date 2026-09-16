@@ -287,40 +287,27 @@ pipeline {
             }
         }
 
-
-        stage('Health Check') {
-
-            steps {
-
+    stage('Health Check') {
+        steps {
+            sshagent(credentials: ['app-ec2-ssh-key']) {
                 script {
+                    sleep 10
 
-                    sleep(time: 10, unit: 'SECONDS')
+                def status = sh(
+                    script: '''
+                        ssh -o StrictHostKeyChecking=no ubuntu@10.0.1.24 \
+                        "curl -fsS http://localhost/health"
+                    ''',
+                    returnStatus: true
+                )
 
-                    def healthStatus = sh(
-                        script: """
-                            ssh \
-                            -o StrictHostKeyChecking=no \
-                            ubuntu@${APP_SERVER} \
-                            "curl -fsS \
-                            http://localhost/health"
-                        """,
-                        returnStatus: true
-                    )
-
-
-                    if (healthStatus != 0) {
-
-                        error(
-                            'Application health check failed'
-                        )
-                    }
-
-
-                    echo 'Application health check passed'
+                if (status != 0) {
+                    error('Application health check failed')
                 }
             }
         }
-
+    }
+}
 
         stage('Deployment Information') {
 
